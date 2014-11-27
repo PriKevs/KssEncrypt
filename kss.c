@@ -27,7 +27,7 @@ again:;
         
         Getkey(passwd, strlen(passwd), key);
         if (Encrypt(fileopen, filesave, key, KEYLEN) < 0){
-            printf("Errors occur while encrypting file.");
+            printf("Errors occur while encrypting file.\n");
             return 0;
         }
         break;
@@ -42,8 +42,8 @@ again:;
         scanf("%s", filesave);
 
         Getkey(passwd, strlen(passwd), key);
-        if (Encrypt(fileopen, filesave, key, KEYLEN) < 0){
-            printf("Errors occur while decrypting file.");
+        if (Decrypt(fileopen, filesave, key, KEYLEN) < 0){
+            printf("Errors occur while decrypting file.\n");
             return 0;
         }
         break;
