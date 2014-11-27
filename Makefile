@@ -1,5 +1,5 @@
-EncryptKSS: kss.o getkey.o filesize.o crypt.o md5.o aes.o
-	gcc -o EncryptKSS kss.o getkey.o filesize.o crypt.o md5.o aes.o
+encryptKSS: kss.o getkey.o filesize.o crypt.o md5.o aes.o
+	gcc -o encryptKSS kss.o getkey.o filesize.o crypt.o md5.o aes.o
 kss.o: kss.h getkey.h crypt.h kss.c
 	gcc -c -o kss.o kss.c
 getkey.o: kss.h ./libcrypt/md5.h getkey.c
@@ -14,4 +14,4 @@ aes.o: ./libcrypt/aes.h ./libcrypt/aes.c
 	gcc -c -o aes.o ./libcrypt/aes.c
 
 clean:
-	rm *.o EncryptKSS
+	rm *.o encryptKSS

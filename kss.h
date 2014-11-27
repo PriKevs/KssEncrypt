@@ -4,6 +4,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #define KEYLEN 16
 #define PASSWDLEN 100
