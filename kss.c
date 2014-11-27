@@ -15,6 +15,9 @@ int main(int argc, char *argv[])
     int encrypt, decrypt, save, usage;
 
     encrypt = decrypt = save = usage = 0;
+    
+    memset(fileopen, 0, sizeof(fileopen));
+    memset(filesave, 0, sizeof(filesave));
 
     while((opt = getopt(argc, argv, "d:s:")) != -1){
         switch(opt){
@@ -47,9 +50,15 @@ int main(int argc, char *argv[])
     }
 
     if (save == 0){
-        strncpy(filesave, fileopen, NAMELEN);
-        if (encrypt == 1)
+        if (encrypt == 1){
+            strncpy(filesave, fileopen, NAMELEN);
             strncat(filesave, ".kss", 4);
+        }
+        else if (decrypt == 1){
+            if (strlen(fileopen) > 4 &&\
+                    strncmp(".kss", fileopen + strlen(fileopen) - 4, 4) == 0)
+                strncpy(filesave, fileopen, strlen(fileopen) - 4);
+        }
     }
 
 

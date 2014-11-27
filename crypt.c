@@ -30,21 +30,21 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
 
     fclose(fo);
     
+    memmove(data + fillsize, data, size);
+    data[16] = (unsigned char)(fillsize - 16);
+    for(i = 17; i < fillsize; i++)
+        *(data + i) = rand() % 255;
     md5_starts(&mdf);
-    md5_update(&mdf, data, size);
+    md5_update(&mdf, data + 16, msize - 16);
     md5_finish(&mdf, digest);
+    memcpy(data, digest, 16);
+
     /*
     printf("encrypt:\n");
     for(i = 0; i < 16; i++)
         printf("%02x", digest[i]);
     printf("\n");
     */
-
-    memmove(data + fillsize, data, size);
-    memcpy(data, digest, 16);
-    data[16] = (unsigned char)(fillsize - 16);
-    for(i = 17; i < fillsize; i++)
-        *(data + i) = rand() % 255;
 
     aes_set_key(&aes, key, keylen * 8);
     crypt = 0;
@@ -97,34 +97,37 @@ int Decrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
         crypt += 16;
     }
 
-    fillsize = data[16] + 16;
     memcpy(fdigest, data, 16);
+    
     /*
     printf("ffdecrypt:\n");
     for(i = 0; i < 16; i++)
         printf("%02x", fdigest[i]);
-    printf("\n");
-    printf("\n");
-    printf("fillsize=%d\nmsize=%d\n", (int)fillsize, (int)msize);
-    printf("data16=%d\n", (int)data[16]);
-    for(i = fillsize; i < msize; i++)
-        printf("%c", data[i]);
+      printf("\n");
+      printf("\n");
+      printf("fillsize=%d\nmsize=%d\n", (int)fillsize, (int)msize);
+      printf("data16=%d\n", (int)data[16]);
+      for(i = fillsize; i < msize; i++)
+         printf("%c", data[i]);
     printf("\n\n");
     */
+   
     md5_starts(&mdf);
-    md5_update(&mdf, data + fillsize, msize - fillsize);
+    md5_update(&mdf, data + 16, msize - 16);
     md5_finish(&mdf, digest);
+    
     /*
     printf("decrypt:\n");
     for(i = 0; i < 16; i++)
         printf("%02x", digest[i]);
     printf("\n");
     */
+    
     if (memcmp(fdigest, digest, 16) != 0){
-        printf("%s\n", data);
         printf("Invalid PASSWD or Data damaged.\n");
         return -1;
     }
+    fillsize = data[16] + 16;
 
     fs = fopen(filesave, "wb");
     if (fs == NULL){
