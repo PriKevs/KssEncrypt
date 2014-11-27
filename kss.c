@@ -11,7 +11,7 @@ int main()
     char filesave[NAMELEN];
     unsigned char passwd[PASSWDLEN];
     unsigned char key[KEYLEN];
-again:
+again:;
     menu();
     scanf("%d", &choice);
     switch(choice){
@@ -47,10 +47,10 @@ again:
             return 0;
         }
         break;
-    }
     default:
         printf("Invalid choice.\n");        
         goto again;
+    }
     return 0;
 }
 

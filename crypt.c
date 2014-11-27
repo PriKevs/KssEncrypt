@@ -53,7 +53,7 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
         return -1;
     }
     fwrite(data, 1, msize, fs);
-    fwrite(data, 1, 1 + rand() % 15, fs)
+    fwrite(data, 1, 1 + rand() % 15, fs);
     fclose(fs);
     return 0;
 }
@@ -91,7 +91,7 @@ int Decrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
         crypt += 16;
     }
 
-    fillsize = msize - (data[16] + 16)
+    fillsize = msize - (data[16] + 16);
     memcpy(fdigest, data, 16);
     md5_starts(&mdf);
     md5_update(&mdf, data + fillsize, msize - fillsize);
