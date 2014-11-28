@@ -13,6 +13,7 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
     md5_context mdf;
     aes_context aes;
 
+    /*Use time as seed*/
     srand(time(NULL));
 
     fo = fopen(fileopen, "rb");
@@ -21,8 +22,13 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
         return -1;
     }    
 
+    /*Caculate the chars of file and add rand() numbers*/
     add = 0 + rand() % 16;
     size = Getfilesize(fo);
+    if (size == 0){
+        printf("Empty file.\n");
+        return -1;
+    }
     msize = (((size + add)/16) + 2)*16;
     fillsize = msize - size;
     data = (unsigned char *)malloc(msize);
@@ -30,6 +36,7 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
 
     fclose(fo);
     
+    /*Get the MD5 hash*/
     memmove(data + fillsize, data, size);
     data[16] = (unsigned char)(fillsize - 16);
     for(i = 17; i < fillsize; i++)
@@ -39,13 +46,7 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
     md5_finish(&mdf, digest);
     memcpy(data, digest, 16);
 
-    /*
-    printf("encrypt:\n");
-    for(i = 0; i < 16; i++)
-        printf("%02x", digest[i]);
-    printf("\n");
-    */
-
+    /*AES encryption begin*/
     aes_set_key(&aes, key, keylen * 8);
     crypt = 0;
     while(crypt < msize){
@@ -59,7 +60,8 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
         return -1;
     }
     fwrite(data, 1, msize, fs);
-    fwrite(data, 1, 1 + rand() % 15, fs);
+    /*Add some Invalid chars at the end*/
+    fwrite(data, 1, 0 + rand() % 16, fs);
     fclose(fs);
     return 0;
 }
@@ -80,16 +82,18 @@ int Decrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
         return -1;
     }    
 
+    /*Get size of file and judge and minimum length of file is 32*/
     size = Getfilesize(fo);
-    if (size < 32){
-        printf("Data damaged.\n");
+    msize = (size/16)*16;
+    if (msize <= 32){
+        printf("Invalid file or Data damaged.\n");
         return -1;
     }
-    msize = (size/16)*16;
     data = (unsigned char *)malloc(msize);
     fread(data, 1, msize, fo);
     fclose(fo); 
 
+    /*AES decryption*/
     aes_set_key(&aes, key, keylen * 8);
     crypt = 0; 
     while(crypt < msize){
@@ -99,34 +103,18 @@ int Decrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
 
     memcpy(fdigest, data, 16);
     
-    /*
-    printf("ffdecrypt:\n");
-    for(i = 0; i < 16; i++)
-        printf("%02x", fdigest[i]);
-      printf("\n");
-      printf("\n");
-      printf("fillsize=%d\nmsize=%d\n", (int)fillsize, (int)msize);
-      printf("data16=%d\n", (int)data[16]);
-      for(i = fillsize; i < msize; i++)
-         printf("%c", data[i]);
-    printf("\n\n");
-    */
-   
+    /*Get MD5 hash*/
     md5_starts(&mdf);
     md5_update(&mdf, data + 16, msize - 16);
     md5_finish(&mdf, digest);
     
-    /*
-    printf("decrypt:\n");
-    for(i = 0; i < 16; i++)
-        printf("%02x", digest[i]);
-    printf("\n");
-    */
-    
+    /*Compare MD5 now and before*/
     if (memcmp(fdigest, digest, 16) != 0){
         printf("Invalid PASSWD or Data damaged.\n");
         return -1;
     }
+
+    /*Reading data...*/
     fillsize = data[16] + 16;
 
     fs = fopen(filesave, "wb");

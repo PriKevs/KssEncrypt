@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
     char fileopen[NAMELEN];
     char filesave[NAMELEN];
-    unsigned char *passwd;
+    unsigned char *passwd, tpasswd[PASSWDLEN];
     unsigned char key[KEYLEN];
 
     int opt;
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     /*
     printf("optind=%d, decrypt=%d\n", optind, decrypt);
     */
-    if (usage == 1 || argc == 1 || (optind == 3 && decrypt == 1)){
+    if (usage == 1 || argc == 1){
         Usage();
         return 0;
     }
@@ -66,20 +66,29 @@ int main(int argc, char *argv[])
 
 
     if (encrypt == 1){
-        passwd = getpass("PASSWD:");
+        strncpy(tpasswd, getpass("PASSWD:"), PASSWDLEN);
+        passwd = getpass("AGAIN:");
+        if (strcmp(passwd, tpasswd) != 0){
+            printf("Invalid PASSWD.\n");
+            return 0;
+        }
+        printf("Encrypting...\n");
         Getkey(passwd, strlen(passwd), key);
         if (Encrypt(fileopen, filesave, key, KEYLEN) < 0){
             printf("Errors occur while Encrypting file.\n");
             return 0;
         }     
+        printf("Finished!\n");
     }
     else if (decrypt == 1){
         passwd = getpass("PASSWD:");
+        printf("Decrypting...\n");
         Getkey(passwd, strlen(passwd), key);
         if (Decrypt(fileopen, filesave, key, KEYLEN) < 0){
             printf("Errors occur while Decrypting file.\n");
             return 0;
         }
+        printf("Finished!\n");
     }
     return 0; 
 }
