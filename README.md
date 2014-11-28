@@ -12,7 +12,7 @@ USAGE:
 	usage:encryptkss [FILENAME] |-d FILENAME [-s FILENAME]<br>
 
 	optional arguments:<br>
-		FILENAME			Encrypt file<br>
+		FILENAME		Encrypt file<br>
 		-d FILENAME		Decrypt file<br>
 		-s FILENAME		New file name (Default ORIGINAL.kss or RM .kss)<br>
  
