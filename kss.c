@@ -39,7 +39,10 @@ int main(int argc, char *argv[])
             break;
         }
     }
-    if (usage == 1 || argc == 1){
+    /*
+    printf("optind=%d, decrypt=%d\n", optind, decrypt);
+    */
+    if (usage == 1 || argc == 1 || (optind == 3 && decrypt == 1)){
         Usage();
         return 0;
     }
@@ -83,9 +86,9 @@ int main(int argc, char *argv[])
 
 void Usage()
 {
-    printf("usage:encryptkss -e|-d FILENAME [-s FILENAME]\n\n");
+    printf("usage:encryptkss [FILENAME] |-d FILENAME [-s FILENAME]\n\n");
     printf("optional arguments:\n");
-    printf("  -e FILENAME\tEncrypt file\n");
+    printf("  FILENAME\tEncrypt file\n");
     printf("  -d FILENAME\tDecrypt file\n");
     printf("  -s FILENAME\tNew file name (Default ORIGINAL.kss)\n");
     printf("\nOnline help: <https://github.com/PrKevince/EncryptKSS\n\n");
