@@ -57,12 +57,14 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
     fs = fopen(filesave, "wb");
     if (fs == NULL){
         perror(filesave);
+        free(data);
         return -1;
     }
     fwrite(data, 1, msize, fs);
     /*Add some Invalid chars at the end*/
     fwrite(data, 1, 0 + rand() % 16, fs);
     fclose(fs);
+    free(data);
     return 0;
 }
 
@@ -110,6 +112,7 @@ int Decrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
     
     /*Compare MD5 now and before*/
     if (memcmp(fdigest, digest, 16) != 0){
+        free(data);
         printf("Invalid PASSWD or Data damaged.\n");
         return -1;
     }
@@ -120,10 +123,11 @@ int Decrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
     fs = fopen(filesave, "wb");
     if (fs == NULL){
         perror(filesave);
+        free(data);
         return -1;
     }
     fwrite(data + fillsize, 1, msize - fillsize, fs);
     fclose(fs);
-
+    free(data);
     return 0; 
 }
