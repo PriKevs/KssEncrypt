@@ -5,6 +5,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #define KEYLEN 16
 #define PASSWDLEN 100

@@ -5,6 +5,7 @@
 
 int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
 {
+    struct stat info;
     FILE *fo, *fs;
     unsigned char *data;
     unsigned char digest[16];
@@ -16,6 +17,11 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
     /*Use time as seed*/
     srand(time(NULL));
 
+    stat(fileopen, &info);
+    if (S_ISDIR(info.st_mode)){
+        printf("This is a directory\n");
+        return -1;
+    }
     fo = fopen(fileopen, "rb");
     if (fo == NULL){
         perror(fileopen);
@@ -25,7 +31,7 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
     /*Caculate the chars of file and add rand() numbers*/
     add = 0 + rand() % 16;
     size = Getfilesize(fo);
-    if (size == 0){
+    if (size <= 0){
         printf("Empty file.\n");
         return -1;
     }
@@ -54,6 +60,12 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
         crypt += 16; 
     }
 
+    stat(filesave, &info);
+    if (S_ISDIR(info.st_mode)){
+        printf("This is a directory\n");
+        free(data);
+        return -1;
+    }
     fs = fopen(filesave, "wb");
     if (fs == NULL){
         perror(filesave);
@@ -70,6 +82,7 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
 
 int Decrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
 {
+    struct stat info;
     FILE *fo, *fs;
     unsigned char *data;
     unsigned char fdigest[16], digest[16];
@@ -78,6 +91,11 @@ int Decrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
     md5_context mdf;
     aes_context aes;
 
+    stat(fileopen, &info);
+    if (S_ISDIR(info.st_mode)){
+        printf("This is a directory\n");
+        return -1;
+    }
     fo = fopen(fileopen, "rb");
     if (fo == NULL){
         perror(fileopen);
@@ -120,6 +138,12 @@ int Decrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
     /*Reading data...*/
     fillsize = data[16] + 16;
 
+    stat(filesave, &info);
+    if (S_ISDIR(info.st_mode)){
+        printf("This is a directory\n");
+        free(data);
+        return -1;
+    }
     fs = fopen(filesave, "wb");
     if (fs == NULL){
         perror(filesave);
