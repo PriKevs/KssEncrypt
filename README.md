@@ -9,18 +9,18 @@ A file encryption implemented in C
 USAGE:
 -------------------------
 
-	usage:encryptkss [FILENAME] |-d FILENAME [-s FILENAME]<br>
+	usage:encryptkss [FILENAME] |-d FILENAME [-s FILENAME]
 
-	optional arguments:<br>
-		FILENAME		Encrypt file<br>
-		-d FILENAME		Decrypt file<br>
-		-s FILENAME		New file name (Default ORIGINAL.kss or RM .kss)<br>
+	optional arguments:
+		FILENAME		Encrypt file
+		-d FILENAME		Decrypt file
+		-s FILENAME		New file name (Default ORIGINAL.kss or RM .kss)
  
 	Online help: <https://github.com/PrKevince/EncryptKSS>
 
 
 Encryption Medthod:
 -----------------------
-* random number<br>
-* MD5<br>
-* AES-128-ECB<br>
+* random number
+* MD5
+* AES-128-ECB
