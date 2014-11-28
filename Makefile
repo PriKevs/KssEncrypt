@@ -15,3 +15,9 @@ aes.o: ./libcrypt/aes.h ./libcrypt/aes.c
 
 clean:
 	rm *.o encryptKSS
+
+install:
+	cp encryptKSS /usr/local/bin
+
+uninstall:
+	rm /usr/local/bin/encryptKSS
