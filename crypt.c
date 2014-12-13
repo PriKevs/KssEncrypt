@@ -2,6 +2,7 @@
 #include "filesize.h"
 #include "libcrypt/aes.h"
 #include "libcrypt/md5.h"
+#include "progress.h"
 
 int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
 {
@@ -13,6 +14,8 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
     int i, add;
     md5_context mdf;
     aes_context aes;
+    clock_t begin, mid;
+    progress_t bar;
 
     /*Use time as seed*/
     srand(time(NULL));
@@ -35,12 +38,15 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
         printf("Empty file.\n");
         return -1;
     }
+    printf("Initilizing...\n");
+    fflush(stdout);
     msize = (((size + add)/16) + 2)*16;
     fillsize = msize - size;
     data = (unsigned char *)malloc(msize);
     fread(data, 1, size, fo);
 
     fclose(fo);
+
     
     /*Get the MD5 hash*/
     memmove(data + fillsize, data, size);
@@ -55,10 +61,22 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
     /*AES encryption begin*/
     aes_set_key(&aes, key, keylen * 8);
     crypt = 0;
+
+    progress_init(&bar, "Encrypting", 50, PROGRESS_CHR_STYLE);
+    begin = clock();
     while(crypt < msize){
         aes_encrypt(&aes, data + crypt, data + crypt);
         crypt += 16; 
+        mid = clock();
+        if ((mid - begin)/CLOCKS_PER_SEC > 1){
+            progress_show(&bar, crypt*1.0/msize);
+            begin = mid;
+        }
     }
+    progress_show(&bar, crypt*1.0/msize);
+    printf("\n");
+    fflush(stdout);
+    progress_destroy(&bar);
 
     stat(filesave, &info);
     if (S_ISDIR(info.st_mode)){
@@ -74,6 +92,8 @@ int Encrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
     }
     fwrite(data, 1, msize, fs);
     /*Add some Invalid chars at the end*/
+    printf("Writing to the file...\n");
+    fflush(stdout);
     fwrite(data, 1, 0 + rand() % 16, fs);
     fclose(fs);
     free(data);
@@ -90,6 +110,8 @@ int Decrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
     int i;
     md5_context mdf;
     aes_context aes;
+    clock_t begin, mid;
+    progress_t bar;
 
     stat(fileopen, &info);
     if (S_ISDIR(info.st_mode)){
@@ -109,6 +131,8 @@ int Decrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
         printf("Invalid file or Data damaged.\n");
         return -1;
     }
+    printf("Initilizing...\n");
+    fflush(stdout);
     data = (unsigned char *)malloc(msize);
     fread(data, 1, msize, fo);
     fclose(fo); 
@@ -116,11 +140,24 @@ int Decrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
     /*AES decryption*/
     aes_set_key(&aes, key, keylen * 8);
     crypt = 0; 
+    progress_init(&bar, "Decrypting", 50, PROGRESS_CHR_STYLE);
+    begin = clock();
     while(crypt < msize){
         aes_decrypt(&aes, data + crypt, data + crypt);
         crypt += 16;
+        mid = clock();
+        if ((mid - begin)/CLOCKS_PER_SEC > 1){
+            progress_show(&bar, crypt*1.0/msize);
+            begin = mid;
+        }
     }
+    progress_show(&bar, crypt*1.0/msize);
+    printf("\n");
+    fflush(stdout);
+    progress_destroy(&bar);
 
+    printf("Checking...\n");
+    fflush(stdout);
     memcpy(fdigest, data, 16);
     
     /*Get MD5 hash*/
@@ -150,6 +187,8 @@ int Decrypt(char *fileopen, char *filesave, unsigned char *key, int keylen)
         free(data);
         return -1;
     }
+    printf("Writing to the file...\n");
+    fflush(stdout);
     fwrite(data + fillsize, 1, msize - fillsize, fs);
     fclose(fs);
     free(data);
