@@ -1,4 +1,4 @@
-EncryptKSS
+KssEnrypt
 ==========
 
 A file encryption implemented in C
@@ -9,14 +9,14 @@ A file encryption implemented in C
 USAGE:
 -------------------------
 
-	usage:encryptkss [FILENAME] |-d FILENAME [-s FILENAME]
+	usage:kssencrypt [FILENAME] |-d FILENAME [-s FILENAME]
 
 	optional arguments:
 		FILENAME		Encrypt file
 		-d FILENAME		Decrypt file
 		-s FILENAME		New file name (Default ORIGINAL.kss or RM .kss)
  
-	Online help: <https://github.com/PrKevince/EncryptKSS>
+	Online help: <https://github.com/prikevs/KssEncrypt>
 
 
 Encryption Medthod:

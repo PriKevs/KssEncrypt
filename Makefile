@@ -1,5 +1,5 @@
-encryptKSS: kss.o getkey.o filesize.o crypt.o md5.o aes.o progress.o
-	gcc -o encryptKSS kss.o getkey.o filesize.o crypt.o md5.o aes.o progress.o
+kssencrypt: kss.o getkey.o filesize.o crypt.o md5.o aes.o progress.o
+	gcc -o kssencrypt kss.o getkey.o filesize.o crypt.o md5.o aes.o progress.o
 kss.o: kss.h getkey.h crypt.h kss.c
 	gcc -c -o kss.o kss.c
 getkey.o: kss.h ./libcrypt/md5.h getkey.c
@@ -16,10 +16,10 @@ progress.o: progress.h progress.c
 	gcc -c -o progress.o progress.c
 
 clean:
-	rm *.o encryptKSS
+	rm *.o kssencrypt
 
 install:
-	cp encryptKSS /usr/local/bin
+	cp kssencrypt /usr/local/bin
 
 uninstall:
-	rm /usr/local/bin/encryptKSS
+	rm /usr/local/bin/kssencrypt
